@@ -19,6 +19,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'x-custom-header']
 }));
 
+// Maneja solicitudes OPTIONS para solicitudes preflight
+app.options('*', cors());
+
 // Database connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
