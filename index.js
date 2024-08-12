@@ -13,7 +13,11 @@ console.log(process.env.MONGO_URI);
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: '*', // Permite solicitudes de cualquier origen
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI, {
