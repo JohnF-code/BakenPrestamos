@@ -13,14 +13,14 @@ console.log(process.env.MONGO_URI);
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors({
+app.use(cors(/*{
     origin: '*', // Permite solicitudes de cualquier origen
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-custom-header']
-}));
+}*/));
 
 // Maneja solicitudes OPTIONS para solicitudes preflight
-app.options('*', cors());
+// app.options('*', cors());
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI, {
