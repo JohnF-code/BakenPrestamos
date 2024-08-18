@@ -13,11 +13,12 @@ console.log(process.env.MONGO_URI);
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors(/*{
-    origin: '*', // Permite solicitudes de cualquier origen
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-custom-header']
-}*/));
+app.use(cors({
+  origin: '*', // Permite solicitudes de cualquier origen
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: '*',
+  credentials: true
+}));
 
 // Maneja solicitudes OPTIONS para solicitudes preflight
 // app.options('*', cors());
