@@ -20,7 +20,6 @@ app.use(cors());
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
   useUnifiedTopology: true
 });
 
@@ -35,12 +34,14 @@ mongoose.connection.once('open', () => {
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import clientRoutes from './routes/clients.js';
+import loanRoutes from './routes/loans.js';
 import paymentRoutes from './routes/payment.js';
 import financeRoutes from './routes/finances.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/clients', clientRoutes);
+app.use('/api/loans', loanRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/finances', financeRoutes);
 

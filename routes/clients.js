@@ -46,6 +46,22 @@ router.delete('/:id', authenticate, async (req, res) => {
   }
 })
 
+router.put('/:id', authenticate, async (req, res) => { 
+  try {
+    const { id } = req.params;
+
+    const newClient = await Client.updateOne({ _id: id }, req.body);
+
+    res.json({
+      msg: 'Cliente Editado correctamente...'
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
 // Other routes for update and delete can be added here...
 
 export default router;

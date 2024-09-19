@@ -2,7 +2,7 @@
 import express from 'express';
 const router = express.Router();
 import Payment from '../models/Payment.js';
-import Client from '../models/Client.js';
+import Loan from '../models/Loan.js';
 import authenticate from '../middleware/authenticate.js';
 
 // Get all payments
@@ -25,25 +25,25 @@ router.post('/', authenticate, async (req, res) => {
     // Actualizar Cantidad
     const updatedBalance = balance - payment.amount;
 
-    const updatedClient = await Client.findOneAndUpdate({ _id: clientId }, { balance: updatedBalance });
+    const updatedLoan = await Loan.findOneAndUpdate({ clientId }, { balance: updatedBalance });
 
     console.log('=======', updatedBalance);
     // Verificar si la deuda del cliente ya ha terminado
     if (updatedBalance <= 1000) {
-      const terminatedClient = await Client.findOneAndUpdate({ _id: clientId }, {
+      const terminatedLoan = await Loan.findOneAndUpdate({ clientId }, {
         terminated: true
-      });
+      }).populate('clientId');
       //  Mandar respuesta al frontend
       res.status(201).json({
-        terminatedClient,
-        msg: `Felicidades, el usuario ${terminatedClient.name} ha culminado con su prestamo`
+        terminatedLoan,
+        msg: `Felicidades, el usuario ${terminatedLoan?.clientId?.name || ''} ha culminado con su prestamo`
       });
       return;
     }
 
     //  Mandar respuesta al frontend
     res.status(201).json({
-      updatedClient,
+      updatedLoan,
       msg: 'Pago registrado con exito!'
     });
   } catch (error) {

@@ -6,15 +6,9 @@ const ClientSchema = new Schema({
   name: String,
   contact: String,
   document: { type: String },
-  loanAmount: Number,
-  interest: Number,
-  installments: Number,
-  balance: Number,
-  installmentValue: Number,
   date: { type: Date },
-  finishDate: { type: Date },
+  coordinates: { type: [Number], required: true },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  terminated: { type: Boolean, default: false }
 });
 
 ClientSchema.index({ name: 'text' });
