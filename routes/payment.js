@@ -7,7 +7,7 @@ import authenticate from '../middleware/authenticate.js';
 
 // Get all payments
 router.get('/', authenticate, async (req, res) => {
-  const payments = await Payment.find().populate('clientId');
+  const payments = await Payment.find().populate('clientId').populate('loanId');
   res.json(payments);
 });
 
