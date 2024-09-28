@@ -4,6 +4,7 @@ const router = express.Router();
 import Loan from '../models/Loan.js';
 import authenticate from '../middleware/authenticate.js';
 import Clients from '../models/Client.js';
+import Payment from '../models/Payment.js';
 
 // Get all Loans
 router.get('/', authenticate, async (req, res) => {
@@ -53,11 +54,29 @@ router.delete('/:id', authenticate, async (req, res) => {
   try {
     await Loan.findOneAndDelete({ _id: req.params.id });
 
+    const deletedPayments = await Payment.deleteMany({ loanId: req.params.id });
+    console.log(deletedPayments);
     res.json({
-      msg: 'Prestamo Eliminado correctamente'
+      msg: 'Prestamo Eliminado correctamente',
+      deletedPayments
     });
   } catch (error) {
     console.log(error);
+    res.status(500).json(error);
+  }
+});
+
+// Update Loan...
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await Loan.findOneAndUpdate({ _id: req.params.id }, req.body);
+    res.json({
+      msg: 'Prestamo Editado correctamente...',
+      updated
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Hubo un error');
   }
 })
 

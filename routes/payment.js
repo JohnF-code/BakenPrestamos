@@ -11,6 +11,19 @@ router.get('/', authenticate, async (req, res) => {
   res.json(payments);
 });
 
+// Delete Payment
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    const deletedPayment = await Payment.findOneAndDelete({ _id: req.params.id });
+    res.json({
+      msg: 'Pago eliminado correctamente',
+      deletedPayment
+    })
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 // Add new payment
 router.post('/', authenticate, async (req, res) => {
   try {

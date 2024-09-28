@@ -50,7 +50,7 @@ router.put('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const newClient = await Client.updateOne({ _id: id }, req.body);
+    const newClient = await Client.findOneAndUpdate({ _id: id }, req.body);
 
     res.json({
       msg: 'Cliente Editado correctamente...'
