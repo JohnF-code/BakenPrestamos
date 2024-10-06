@@ -4,10 +4,25 @@ const router = express.Router();
 import Payment from '../models/Payment.js';
 import Loan from '../models/Loan.js';
 import authenticate from '../middleware/authenticate.js';
+import User from '../models/User.js';
 
 // Get all payments
 router.get('/', authenticate, async (req, res) => {
-  const payments = await Payment.find().populate('clientId').populate('loanId');
+   // Obtener id del usuario autenticado
+    const { _id } = req.user.user;
+
+    // Buscar al usuario autenticado
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Obtener los pagos que fueron creados por el usuario principal o cualquiera a los que tiene acceso
+  const payments = await Payment.find({
+    createdBy: { $in: user.accessTo }
+  }).populate('clientId').populate('loanId');
+
   res.json(payments);
 });
 
@@ -27,10 +42,11 @@ router.delete('/:id', authenticate, async (req, res) => {
 // Add new payment
 router.post('/', authenticate, async (req, res) => {
   try {
+    const { _id } = req.user.user;
     const { balance, clientId } = req.body;
 
     // Registrar pago
-    const payment = new Payment(req.body);
+    const payment = new Payment({...req.body, createdBy: _id});
     await payment.save();
 
     console.log(payment);
@@ -40,7 +56,6 @@ router.post('/', authenticate, async (req, res) => {
 
     const updatedLoan = await Loan.findOneAndUpdate({ clientId }, { balance: updatedBalance });
 
-    console.log('=======', updatedBalance);
     // Verificar si la deuda del cliente ya ha terminado
     if (updatedBalance <= 1000) {
       const terminatedLoan = await Loan.findOneAndUpdate({ clientId }, {

@@ -5,6 +5,36 @@ const router = express.Router();
 import User from "../models/User.js";
 import authenticate from '../middleware/authenticate.js';
 
+// Crear sub-usuario
+router.post('/subuser', authenticate, async (req, res) => {
+    try {
+        const { name, email, password, role } = req.body;
+
+        // Encriptar password
+        const encryptedPassword = bcrypt.hashSync(password, 10);
+
+        const mainUser = await User.findById(req.user.user._id); // Usuario principal (admin) que está creando el sub-usuario
+
+        // Verificar que el rol del sub-usuario sea válido
+        if (!mainUser || mainUser.role !== 'administrador') {
+            return res.status(403).json({ message: "No tienes permisos para crear usuarios" });
+        }
+
+        // Crear nuevo sub-usuario
+        const newSubUser = await mainUser.addSubUser({
+            name,
+            email,
+            password: encryptedPassword,
+            role
+        });
+
+        res.status(201).json({ message: 'Sub-usuario creado exitosamente', subUser: newSubUser });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al crear sub-usuario' });
+    }
+});
+
 router.post('/register', async (req, res) => {
 
     try {
@@ -47,9 +77,9 @@ router.get('/profile', authenticate, (req, res) => {
 })
 
 router.get('/', authenticate, async (req, res) => {
-    
     try {
-        const users = await User.find();
+        const { _id } = req.user.user;
+        const users = await User.find({ createdBy: _id });
         res.json(users);
     } catch (error) {
         console.log(error)

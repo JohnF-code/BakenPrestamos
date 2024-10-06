@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const PaymentSchema = new Schema({
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   clientId: { type: Schema.Types.ObjectId, ref: 'Client' },
   loanId: { type: Schema.Types.ObjectId, ref: 'Loan' },
   amount: Number,

@@ -3,18 +3,26 @@ import express from 'express';
 const router = express.Router();
 import Client from '../models/Client.js';
 import authenticate from '../middleware/authenticate.js';
+import User from '../models/User.js';
 
 // Get all clients
 router.get('/', authenticate, async (req, res) => {
-  console.log('Consultaste Clients');
-  const { search } = req.query;
   try {
-    if (search) {
-      // Si hay una busqueda
-      const clients = await Client.find({ $text: { $search: search } })
-      return res.json(clients);
+    // Obtener id del usuario autenticado
+    const { _id } = req.user.user;
+
+    // Buscar al usuario autenticado
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    const clients = await Client.find();
+
+    // Obtener los clientes que fueron creados por el usuario principal o cualquiera a los que tiene acceso
+    const clients = await Client.find({
+      createdBy: { $in: user.accessTo }
+    });
+
     res.json(clients);
   } catch (error) {
     console.log(error);
@@ -25,7 +33,8 @@ router.get('/', authenticate, async (req, res) => {
 // Add new client
 router.post('/', authenticate, async (req, res) => {
   try {
-    const client = new Client(req.body);
+    const { _id } = req.user.user;
+    const client = new Client({...req.body, createdBy: _id });
     await client.save();
     res.status(201).json(client);
   } catch (error) {
@@ -36,7 +45,9 @@ router.post('/', authenticate, async (req, res) => {
 
 router.delete('/:id', authenticate, async (req, res) => {
   try {
-    await Client.findOneAndDelete({ _id: req.params.id });
+    await Client.findOneAndDelete({
+      _id: req.params.id
+    });
 
     res.json({
       msg: 'Cliente Eliminado correctamente'
@@ -50,7 +61,7 @@ router.put('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const newClient = await Client.findOneAndUpdate({ _id: id }, req.body);
+    const newClient = await Client.findOneAndUpdate({ _id: id}, req.body);
 
     res.json({
       msg: 'Cliente Editado correctamente...'
