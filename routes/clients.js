@@ -2,6 +2,7 @@
 import express from 'express';
 const router = express.Router();
 import Client from '../models/Client.js';
+import Loan from '../models/Loan.js'
 import authenticate from '../middleware/authenticate.js';
 import User from '../models/User.js';
 
@@ -45,6 +46,10 @@ router.post('/', authenticate, async (req, res) => {
 
 router.delete('/:id', authenticate, async (req, res) => {
   try {
+    await Loan.deleteMany({
+      clientId: req.params.id
+    });
+    
     await Client.findOneAndDelete({
       _id: req.params.id
     });
