@@ -29,10 +29,20 @@ router.get('/', authenticate, async (req, res) => {
 // Delete Payment
 router.delete('/:id', authenticate, async (req, res) => {
   try {
+    // Eliminar pago
     const deletedPayment = await Payment.findOneAndDelete({ _id: req.params.id });
+    
+    // Econtrar prestamo al que pertenece el pago
+    const { loanId } = deletedPayment;
+    const loan = await Loan.findOne({ _id: loanId });
+
+    // Actualizar balance
+    const updatedLoan = await Loan.findOneAndUpdate({ _id: loanId }, { balance: loan.balance + deletedPayment.amount, terminated: false });
+
     res.json({
       msg: 'Pago eliminado correctamente',
-      deletedPayment
+      deletedPayment,
+      updatedLoan
     })
   } catch (error) {
     console.log(error);
@@ -43,7 +53,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 router.post('/', authenticate, async (req, res) => {
   try {
     const { _id } = req.user.user;
-    const { balance, clientId } = req.body;
+    const { balance, loanId } = req.body;
 
     // Registrar pago
     const payment = new Payment({...req.body, createdBy: _id});
@@ -54,7 +64,7 @@ router.post('/', authenticate, async (req, res) => {
     // Actualizar Cantidad
     const updatedBalance = balance - payment.amount;
 
-    const updatedLoan = await Loan.findOneAndUpdate({ clientId }, { balance: updatedBalance });
+    const updatedLoan = await Loan.findOneAndUpdate({ _id: loanId }, { balance: updatedBalance });
 
     // Verificar si la deuda del cliente ya ha terminado
     if (updatedBalance <= 1000) {
