@@ -31,7 +31,7 @@ router.post('/subuser', authenticate, async (req, res) => {
         res.status(201).json({ message: 'Sub-usuario creado exitosamente', subUser: newSubUser });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error al crear sub-usuario' });
+        res.status(500).json(error);
     }
 });
 

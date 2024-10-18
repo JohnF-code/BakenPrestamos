@@ -53,7 +53,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 router.post('/', authenticate, async (req, res) => {
   try {
     const { _id } = req.user.user;
-    const { balance, loanId } = req.body;
+    const { balance, loanId, clientId } = req.body;
 
     // Registrar pago
     const payment = new Payment({...req.body, createdBy: _id});
