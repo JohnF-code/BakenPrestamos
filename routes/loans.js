@@ -94,11 +94,62 @@ router.delete('/:id', authenticate, async (req, res) => {
 // Update Loan...
 router.put('/:id', async (req, res) => {
   try {
-    const updated = await Loan.findOneAndUpdate({ _id: req.params.id }, req.body);
-    res.json({
-      msg: 'Prestamo Editado correctamente...',
-      updated
-    })
+    const { id } = req.params;
+
+    const {
+      description,
+      loanAmount,
+      interest,
+      installments,
+      date,
+      clientId
+    } = req.body;
+
+    const loan = await Loan.findOne({ _id: id });
+
+    if (!loan) {
+      // No se encontro el prestamo
+      return res.status(404).json({ message: 'Préstamo no encontrado' });
+    }
+
+    // Entonces modificar también el saldo y número de cuotas
+    const payments = await Payment.find({ loanId: id });
+
+    let newBalance = loan.balance;
+    let newInstallmentValue = loan.installmentValue;
+
+
+    // Calcular el todal de pagos realizados
+    const totalPayments = payments.reduce((total, pago) => total + pago.amount, 0);
+
+    // Verificar si editaron el monto del prestamo
+    if (loanAmount !== loan.loanAmount || interest !== loan.interest || installments !== loan.installments) {
+
+      // Calcular el nuevo saldo (balance), asumiendo que el balance se basa en el nuevo loanAmount
+      const capitalConInteres = loanAmount * (1 + interest / 100);  // Ajuste del préstamo con el nuevo interés
+      newBalance = capitalConInteres - totalPayments; // Resta de los pagos ya realizados
+
+      // Recalcular el valor de la cuota (installmentValue)
+      newInstallmentValue = loanAmount / installments;
+    }
+
+    // Actualizar el préstamo con los nuevos valores
+    const updatedPrestamo = await Loan.findByIdAndUpdate(
+      id,
+      {
+        description,
+        loanAmount,
+        interest,
+        installments, // Mantener el número de cuotas si no se modificó
+        date,
+        clientId,
+        installmentValue: newInstallmentValue, // Nuevo valor de la cuota
+        balance: newBalance // Actualizamos el balance con el nuevo cálculo
+      }
+    );
+
+    res.json({ message: 'Préstamo actualizado correctamente', updatedPrestamo });
+
   } catch (error) {
     console.log(error);
     res.status(500).send('Hubo un error');

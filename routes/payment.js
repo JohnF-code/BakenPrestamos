@@ -68,7 +68,7 @@ router.post('/', authenticate, async (req, res) => {
 
     // Verificar si la deuda del cliente ya ha terminado
     if (updatedBalance <= 1000) {
-      const terminatedLoan = await Loan.findOneAndUpdate({ clientId }, {
+      const terminatedLoan = await Loan.findOneAndUpdate({ _id: loanId, clientId }, {
         terminated: true
       }).populate('clientId');
       //  Mandar respuesta al frontend
