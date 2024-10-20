@@ -37,6 +37,8 @@ import clientRoutes from './routes/clients.js';
 import loanRoutes from './routes/loans.js';
 import paymentRoutes from './routes/payment.js';
 import financeRoutes from './routes/finances.js';
+import billsRoutes from './routes/bills.js';
+import withDrawalsRoutes from './routes/withdrawals.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -44,6 +46,8 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/finances', financeRoutes);
+app.use('/api/bills', billsRoutes);
+app.use('/api/withdrawals', withDrawalsRoutes)
 
 // Start the server
 const PORT = process.env.PORT || 5000;

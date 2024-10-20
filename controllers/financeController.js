@@ -33,3 +33,17 @@ export const addFinance = async (req, res) => {
     res.status(500).json({ message: "Error al añadir financiamiento" });
   }
 };
+
+export const deleteFinance = async (req, res) => {
+  try {
+     const deletedCapital = await Finance.findOneAndDelete({ _id: req.params.id });
+
+      res.json({
+          msg: 'Capital eliminado correctamente!',
+          deletedCapital
+      })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+}

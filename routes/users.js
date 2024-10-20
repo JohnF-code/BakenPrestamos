@@ -14,7 +14,7 @@ router.post('/subuser', authenticate, async (req, res) => {
         const encryptedPassword = bcrypt.hashSync(password, 10);
 
         const mainUser = await User.findById(req.user.user._id); // Usuario principal (admin) que está creando el sub-usuario
-
+        
         // Verificar que el rol del sub-usuario sea válido
         if (!mainUser || mainUser.role !== 'administrador') {
             return res.status(403).json({ message: "No tienes permisos para crear usuarios" });
@@ -31,7 +31,7 @@ router.post('/subuser', authenticate, async (req, res) => {
         res.status(201).json({ message: 'Sub-usuario creado exitosamente', subUser: newSubUser });
     } catch (error) {
         console.error(error);
-        res.status(500).json(error);
+        res.status(p).json(error);
     }
 });
 
